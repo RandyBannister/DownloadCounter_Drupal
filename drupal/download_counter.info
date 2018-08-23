@@ -1,0 +1,8 @@
+name = Download Counter
+description = Download Counter is a Drupal module that shows the download count of a specific item.
+core = 7.x
+dependencies[] = token
+dependencies[] = token_filter
+project = "download_counter"
+files[] = download_counter.module
+files[] = download_counter.install

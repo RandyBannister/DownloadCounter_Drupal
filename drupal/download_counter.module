@@ -1,0 +1,68 @@
+<?php
+
+function download_counter_token_info()
+{
+	$info['tokens']['downloadcount'] = array(
+		'name' => t('Download Count'),
+		'description' => t('This will turn the token into a download count.'),
+	);
+	return $info;
+}
+
+/**
+ * Implements hook_tokens(). This hook will operate the token and replace it with its value.
+ */
+function download_counter_tokens($type, $tokens, array $data = array(), array $options = array())
+{
+	$replacements = array();
+	$sanitize = !empty($options['sanitize']);
+
+	if ($type == 'downloadcount')
+	{
+		foreach ($tokens as $download_counterID => $original)
+		{
+			if ($download_counterID)
+			{
+				if (strstr($download_counterID, ":"))
+				{
+					$downloadCounterNames = explode($download_counterID, ":");
+
+					$totalCount = 0;
+
+					foreach ($downloadCounterNames as $downloadCounterName)
+					{
+						$totalCount += getDownloadCount($downloadCounterName);
+
+					}
+
+					$replacements[$original] = $totalCount;
+				}
+				else
+				{
+					$replacements[$original] = getDownloadCount($download_counterID);
+				}
+			}
+		}
+	}
+
+	return $replacements;
+}
+
+function getDownloadCount($name)
+{
+	$data = db_query("SELECT * FROM {download_counter} WHERE name = :name LIMIT 1", array(':name' => $name)) -> fetchObject();
+
+	if ($data)
+	{
+
+		if (empty($data -> count) || $data -> count == null || $data -> count < 0)
+		{
+			$data -> count = 0;
+		}
+
+		return $data -> count;
+	}
+	
+	return 0;
+}
+?>

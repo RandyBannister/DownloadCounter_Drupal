@@ -1,0 +1,51 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the module.
+ *
+ */
+
+/**
+ * Implements hook_install().
+ */
+function download_counter_install()
+{
+	drupal_set_message(st("Successfully installed download counter!"));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function download_counter_uninstall()
+{
+	// Variables cleanup
+	db_delete('variable') -> condition('name', 'download_counter_%', 'LIKE') -> execute();
+	cache_clear_all('variables', 'cache');
+}
+
+/**
+ * Implements hook_schema().
+ */
+function download_counter_schema()
+{
+	$schema['download_counter'] = array(
+		'fields' => array(
+			'name' => array(
+				'type' => 'varchar',
+				'length' => '255',
+				'not null' => TRUE,
+			),
+			'count' => array(
+				'type' => 'int',
+				'not null' => TRUE,
+				'default' => 0,
+				'size' => 'big',
+			),
+		),
+		'primary key' => array('name'),
+		'indexes' => array('name' => array('name'), ),
+	);
+
+	return $schema;
+}
+?>
